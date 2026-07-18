@@ -1,0 +1,128 @@
+{
+  "name": "yumagic",
+  "private": true,
+  "version": "1.6.4",
+  "description": "YuMagic - AI 图像创意管理应用",
+  "author": "YuMagic",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "node --experimental-strip-types --test hooks/canvasDragSession.test.mjs components/PebblingCanvas/minimapUtils.test.mjs components/PebblingCanvas/canvasKeyboardShortcuts.test.mjs components/PebblingCanvas/nodes/providerModelSelectUsage.test.mjs components/PebblingCanvas/imageGenerationOptionsUsage.test.mjs components/PebblingCanvas/execution/videoBatchProviderUsage.test.mjs utils/desktopCanvasGrouping.test.mjs backend-nodejs/src/config.test.mjs backend-nodejs/src/routes/providerModels.test.mjs backend-nodejs/src/routes/videoProxy.test.mjs backend-nodejs/src/utils/generatedImageOutput.test.mjs src/features/provider-settings/services/apiProviderSettingsClient.test.mjs src/features/provider-settings/services/apiProviderRuntimeResolver.test.mjs src/features/video-generation/services/videoApiResponse.test.mjs src/features/video-generation/services/videoTaskRunner.test.mjs src/features/video-generation/services/videoDownload.test.mjs",
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"cd backend-nodejs && npm start\" \"npm run dev\" \"wait-on http://localhost:5176 http://localhost:8765 && cross-env NODE_ENV=development electron .\"",
+    "electron:build": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder",
+    "package": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win --x64",
+    "package:all": "npm run build && electron-builder -mwl",
+    "pack:mac": "npm run build && electron-builder --mac",
+    "upload": "node release-uploader/upload.cjs",
+    "upload:mac": "node release-uploader/upload.cjs --mac",
+    "release": "npm run package && npm run upload",
+    "release:mac": "npm run pack:mac && npm run upload:mac"
+  },
+  "dependencies": {
+    "@google/genai": "^1.16.0",
+    "@tanstack/react-virtual": "^3.13.18",
+    "@types/three": "^0.182.0",
+    "@xyflow/react": "^12.10.0",
+    "electron-updater": "^6.7.3",
+    "jszip": "^3.10.1",
+    "lucide-react": "^0.562.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "three": "^0.182.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/pngjs": "^6.0.5",
+    "basic-ftp": "^5.1.0",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
+    "icojs": "^0.20.1",
+    "png-to-ico": "^3.0.1",
+    "pngjs": "^7.0.0",
+    "rcedit": "^5.0.2",
+    "sharp": "^0.35.2",
+    "ssh2-sftp-client": "^12.0.1",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0",
+    "wait-on": "^9.0.3"
+  },
+  "build": {
+    "appId": "com.yumagic.app",
+    "productName": "YuMagic",
+    "afterPack": "./scripts/afterPack.cjs",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "backend-nodejs/src/**/*",
+      "backend-nodejs/data/**/*",
+      "backend-nodejs/package.json",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/icon.png",
+        "to": "icon.png"
+      },
+      {
+        "from": "resources/icon.ico",
+        "to": "icon.ico"
+      },
+      {
+        "from": "backend-nodejs/node_modules",
+        "to": "app.asar.unpacked/backend-nodejs/node_modules",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "asarUnpack": [
+      "backend-nodejs/**/*",
+      "dist/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "resources/icon.ico",
+      "signAndEditExecutable": false,
+      "requestedExecutionLevel": "asInvoker",
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "installerIcon": "resources/icon.ico",
+      "uninstallerIcon": "resources/icon.ico",
+      "installerHeaderIcon": "resources/icon.ico",
+      "installerSidebar": "resources/installerSidebar.bmp"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "resources/icon.icns",
+      "category": "public.app-category.graphics-design",
+      "identity": null
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "resources/icon.ico",
+      "category": "Graphics"
+    }
+  }
+}
